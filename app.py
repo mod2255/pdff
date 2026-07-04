@@ -5,8 +5,8 @@ import random
 from datetime import datetime
 
 # ============ إعدادات البوت ============
-TOKEN = "8618971021:AAHNf7o2muoU1ZiFx7k"
-CHAT_ID = "78225315"
+TOKEN = "8618971021:AAHNf7o217k"
+CHAT_ID = "5315"
 API_URL = f"https://api.telegram.org/bot{TOKEN}"
 
 # ============ دوال البوت الأساسية ============
